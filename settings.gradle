@@ -1,0 +1,9 @@
+pluginManagement {
+    plugins { spec ->
+        spec.id('org.springframework.boot').version("2.7.2")
+        spec.id('io.spring.dependency-management').version('1.0.11.RELEASE')
+    }
+}
+
+rootProject.name = 'multipartdemo'
+include('app')
