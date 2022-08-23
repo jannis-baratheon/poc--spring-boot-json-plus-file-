@@ -1,8 +1,11 @@
 package it.januszwisniowski.multipartdemo;
 
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.apache.tomcat.util.http.fileupload.util.Streams;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,8 +24,10 @@ import java.util.stream.Stream;
 @RequestMapping("/api")
 @RestController
 public class FileController {
-    @PostMapping("/files")
-    public ResponseEntity<String> createFile(@RequestPart("metadata") FileMetadataDTO fileMetadataDTO,
+    @PostMapping(value = "/files", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    // This is how to adjust OpenAPI specification to treat "metadata" as "application/json", unfortunately Swagger-UI does not recognize "encoding" part of the specification, so we have to use a @parameter workaround (https://github.com/springdoc/springdoc-openapi/issues/820#issuecomment-672875450)
+    //    @io.swagger.v3.oas.annotations.parameters.RequestBody(content = @Content(encoding = @Encoding(name = "metadata", contentType = "application/json")))
+    public ResponseEntity<String> createFile(@RequestPart("metadata") @Parameter(schema = @Schema(type = "string", format = "binary")) FileMetadataDTO fileMetadataDTO,
                                              @RequestPart("file") MultipartFile file) throws URISyntaxException, IOException {
         try (InputStream is = file.getInputStream()) {
             return ResponseEntity
